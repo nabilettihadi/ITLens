@@ -1,11 +1,12 @@
 package ma.nabil.ITLens.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+import lombok.Data;
 import java.util.List;
 
 @Entity
+@Data
 public class Survey {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,10 +18,11 @@ public class Survey {
 
     @Size(max = 255, message = "Description must be less than 255 characters")
     private String description;
-
-    @OneToMany(mappedBy = "survey")
+    
+    @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL)
     private List<SurveyEdition> editions;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @NotNull(message = "Owner is mandatory")
     private Owner owner;
 }
