@@ -1,6 +1,6 @@
 package ma.nabil.ITLens.entity;
 
 public enum QuestionType {
-    SINGLE_CHOICE,
-    MULTIPLE_CHOICE
+    CHOIX_UNIQUE,
+    CHOIX_MULTIPLE
 }
