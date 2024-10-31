@@ -11,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Data
-public class SubChapter {
+public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -20,11 +20,18 @@ public class SubChapter {
     @Size(min = 3, max = 100, message = "Title must be between 3 and 100 characters")
     private String title;
 
-    @ManyToOne(optional = false)
-    @NotNull(message = "Chapter is mandatory")
-    @JoinColumn(name = "chapter_id")
-    private Chapter chapter;
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private Subject parent;
 
-    @OneToMany(mappedBy = "subChapter", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Subject> children = new ArrayList<>();
+
+    @ManyToOne
+    @NotNull(message = "Survey is mandatory")
+    @JoinColumn(name = "survey_id")
+    private Survey survey;
+
+    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions = new ArrayList<>();
 }

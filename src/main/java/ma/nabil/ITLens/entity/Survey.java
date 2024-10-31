@@ -29,7 +29,7 @@ public class Survey {
     private Owner owner;
 
     @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL)
-    private List<Chapter> chapters = new ArrayList<>();
+    private List<Subject> subjects = new ArrayList<>();
 
     @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL)
     private List<SurveyEdition> editions = new ArrayList<>();

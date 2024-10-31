@@ -9,6 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 public interface SurveyRepository extends JpaRepository<Survey, Integer> {
     Page<Survey> findByOwnerId(Integer ownerId, Pageable pageable);
 
-    @Query("SELECT s FROM Survey s LEFT JOIN FETCH s.chapters c LEFT JOIN FETCH c.subChapters WHERE s.id = :id")
-    Survey findByIdWithChapters(Integer id);
+    @Query("SELECT s FROM Survey s LEFT JOIN FETCH s.subjects sub LEFT JOIN FETCH sub.children WHERE s.id = :id")
+    Survey findByIdWithSubjects(Integer id);
 }

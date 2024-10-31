@@ -29,10 +29,10 @@ public class Question {
     private Integer answerCount = 0;
 
     @ManyToOne(optional = false)
-    @NotNull(message = "SubChapter is mandatory")
-    @JoinColumn(name = "sub_chapter_id")
-    private SubChapter subChapter;
+    @NotNull(message = "Subject is mandatory")
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> answers = new ArrayList<>();
 }

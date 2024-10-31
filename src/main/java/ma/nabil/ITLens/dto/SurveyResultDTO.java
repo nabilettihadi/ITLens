@@ -15,26 +15,26 @@ public class SurveyResultDTO {
     @NotBlank(message = "Survey title is mandatory")
     private String surveyTitle;
 
-    @NotEmpty(message = "Chapters list cannot be empty")
+    @NotEmpty(message = "Subjects list cannot be empty")
     @Valid
-    private List<ChapterResultDTO> chapters;
+    private List<SubjectResultDTO> subjects;
 
     @Data
-    public static class ChapterResultDTO {
-        @NotBlank(message = "Chapter title is mandatory")
+    public static class SubjectResultDTO {
+        @NotBlank(message = "Subject title is mandatory")
         private String title;
 
         @Valid
-        private List<SubChapterResultDTO> subChapters;
+        private List<SubjectResultDTO> children;
+
+        @Valid
+        private List<QuestionResultDTO> questions;
     }
 
     @Data
-    public static class SubChapterResultDTO {
-        @NotBlank(message = "SubChapter title is mandatory")
-        private String title;
-
+    public static class QuestionResultDTO {
         @NotBlank(message = "Question text is mandatory")
-        private String question;
+        private String text;
 
         @NotNull(message = "Answers map cannot be null")
         private Map<@NotBlank String, @PositiveOrZero Integer> answers;
