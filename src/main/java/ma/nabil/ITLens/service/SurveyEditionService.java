@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface SurveyEditionService extends GenericService<SurveyEditionDTO, Integer> {
     List<SurveyEditionDTO> getEditionsBySurveyId(Integer surveyId);
+
     SurveyEditionDTO getCurrentEdition(Integer surveyId);
+
     SurveyEdition getSurveyEditionEntity(Integer id);
 }

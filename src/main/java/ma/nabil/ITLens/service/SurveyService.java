@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface SurveyService extends GenericService<SurveyDTO, Integer> {
     Survey getSurveyEntity(Integer id);
+
     SurveyDTO getSurveyWithSubjects(Integer id);
+
     Page<SurveyDTO> getSurveysByOwnerId(Integer ownerId, Pageable pageable);
 }

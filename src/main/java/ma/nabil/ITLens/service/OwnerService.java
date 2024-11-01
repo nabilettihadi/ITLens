@@ -8,5 +8,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface OwnerService extends GenericService<OwnerDTO, Integer> {
     Owner getOwnerEntity(Integer id);
+
     Page<SurveyDTO> getOwnerSurveys(Integer ownerId, Pageable pageable);
 }
