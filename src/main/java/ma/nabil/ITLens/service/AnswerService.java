@@ -5,16 +5,10 @@ import ma.nabil.ITLens.entity.Answer;
 
 import java.util.List;
 
-public interface AnswerService {
-    AnswerDTO createAnswer(AnswerDTO answerDTO);
-
-    AnswerDTO getAnswerById(Integer id);
-
+public interface AnswerService extends GenericService<AnswerDTO, Integer> {
     List<AnswerDTO> getAnswersByQuestionId(Integer questionId);
 
-    AnswerDTO updateAnswer(Integer id, AnswerDTO answerDTO);
-
-    void deleteAnswer(Integer id);
-
     Answer getAnswerEntity(Integer id);
+
+    void incrementSelectionCount(Integer answerId);
 }

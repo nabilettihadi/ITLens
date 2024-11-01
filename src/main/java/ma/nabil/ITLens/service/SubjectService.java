@@ -7,20 +7,9 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-public interface SubjectService {
-    SubjectDTO createSubject(SubjectDTO subjectDTO);
-
-    SubjectDTO getSubjectById(Integer id);
-
+public interface SubjectService extends GenericService<SubjectDTO, Integer> {
     List<SubjectDTO> getRootSubjects(Integer surveyId);
-
     List<SubjectDTO> getChildSubjects(Integer parentId);
-
-    SubjectDTO updateSubject(Integer id, SubjectDTO subjectDTO);
-
-    void deleteSubject(Integer id);
-
     Subject getSubjectEntity(Integer id);
-
     SubjectDTO addChildSubject(Integer parentId, SubjectDTO childDTO);
 }
