@@ -15,6 +15,6 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
     Page<Answer> findMostSelectedAnswersByQuestionId(Integer questionId, Pageable pageable);
 
     @Modifying
-@Query("UPDATE Answer a SET a.selectionCount = a.selectionCount + 1 WHERE a.id = :answerId")
-void incrementSelectionCount(@Param("answerId") Integer answerId);
+    @Query("UPDATE Answer a SET a.selectionCount = a.selectionCount + 1 WHERE a.id = :answerId")
+    void incrementSelectionCount(@Param("answerId") Integer answerId);
 }
