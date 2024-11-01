@@ -60,4 +60,29 @@ public class SubjectServiceImpl extends GenericServiceImpl<SubjectDTO, Subject, 
         child = subjectRepository.save(child);
         return mapper.toDto(child);
     }
+
+    @Override
+    public SubjectDTO create(SubjectDTO dto) {
+        Subject subject = mapper.toEntity(dto);
+        subject.setSurvey(surveyService.getSurveyEntity(dto.getSurveyId()));
+        if (dto.getParentId() != null) {
+            subject.setParent(getSubjectEntity(dto.getParentId()));
+        }
+        subject = subjectRepository.save(subject);
+        return mapper.toDto(subject);
+    }
+
+    @Override
+    public SubjectDTO update(Integer id, SubjectDTO dto) {
+        Subject subject = getSubjectEntity(id);
+        mapper.updateEntity(dto, subject);
+        if (dto.getSurveyId() != null) {
+            subject.setSurvey(surveyService.getSurveyEntity(dto.getSurveyId()));
+        }
+        if (dto.getParentId() != null) {
+            subject.setParent(getSubjectEntity(dto.getParentId()));
+        }
+        subject = subjectRepository.save(subject);
+        return mapper.toDto(subject);
+    }
 }
