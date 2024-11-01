@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface SubjectRepository extends JpaRepository<Subject, Integer> {
     List<Subject> findBySurveyIdAndParentIsNull(Integer surveyId);
-    
+
     @Query("SELECT s FROM Subject s LEFT JOIN FETCH s.children WHERE s.id = :id")
     Subject findByIdWithChildren(Integer id);
 }
