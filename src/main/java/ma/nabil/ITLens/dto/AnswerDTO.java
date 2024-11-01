@@ -2,6 +2,8 @@ package ma.nabil.ITLens.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import ma.nabil.ITLens.validation.annotation.Exists;
+import ma.nabil.ITLens.entity.Question;
 
 @Data
 public class AnswerDTO {
@@ -19,5 +21,6 @@ public class AnswerDTO {
     private Double percentage;
 
     @NotNull(message = "Question ID is mandatory")
+    @Exists(entity = Question.class, message = "La question spécifiée n'existe pas")
     private Integer questionId;
 }

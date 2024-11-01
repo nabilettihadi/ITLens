@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ma.nabil.ITLens.entity.QuestionType;
+import ma.nabil.ITLens.entity.Subject;
+import ma.nabil.ITLens.validation.annotation.Exists;
 
 import java.util.List;
 
@@ -25,6 +27,7 @@ public class QuestionDTO {
     private Integer answerCount;
 
     @NotNull(message = "SubChapter ID is mandatory")
+    @Exists(entity = Subject.class, message = "Le sujet spécifié n'existe pas")
     private Integer subChapterId;
 
     @Valid

@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
+import ma.nabil.ITLens.validation.annotation.Exists;
+import ma.nabil.ITLens.entity.Question;
 import java.util.List;
 
 @Data
@@ -16,9 +18,10 @@ public class SurveyParticipationDTO {
 
     @Data
     public static class ResponseDTO {
-        @NotNull(message = "Question ID is mandatory")
-        @Positive(message = "Question ID must be positive")
-        private Integer questionId;
+    @NotNull(message = "Question ID is mandatory")
+    @Positive(message = "Question ID must be positive")
+    @Exists(entity = Question.class, message = "La question spécifiée n'existe pas")
+    private Integer questionId;
 
         @NotEmpty(message = "Answer IDs list cannot be empty")
         private List<@Positive(message = "Answer ID must be positive") Integer> answerIds;
