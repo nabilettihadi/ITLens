@@ -26,9 +26,9 @@ public class QuestionDTO {
     @Min(value = 0, message = "Answer count cannot be negative")
     private Integer answerCount;
 
-    @NotNull(message = "SubChapter ID is mandatory")
+    @NotNull(message = "Subject ID is mandatory")
     @Exists(entity = Subject.class, message = "Le sujet spécifié n'existe pas")
-    private Integer subChapterId;
+    private Integer subjectId;
 
     @Valid
     private List<AnswerDTO> answers;
