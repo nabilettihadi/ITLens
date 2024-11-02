@@ -1,6 +1,5 @@
 package ma.nabil.ITLens;
 
-import ma.nabil.ITLens.dto.OwnerDTO;
 import ma.nabil.ITLens.dto.SurveyDTO;
 import ma.nabil.ITLens.entity.Owner;
 import ma.nabil.ITLens.entity.Survey;
@@ -22,7 +21,8 @@ import org.springframework.data.domain.PageRequest;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class OwnerServiceImplTest {
@@ -69,7 +69,7 @@ class OwnerServiceImplTest {
         Page<Survey> page = new PageImpl<>(List.of(new Survey()));
         when(surveyRepository.findByOwnerId(1, PageRequest.of(0, 10))).thenReturn(page);
 
-        
+
         Page<SurveyDTO> result = ownerService.getOwnerSurveys(1, PageRequest.of(0, 10));
         assertNotNull(result);
         verify(surveyRepository, times(1)).findByOwnerId(1, PageRequest.of(0, 10));
