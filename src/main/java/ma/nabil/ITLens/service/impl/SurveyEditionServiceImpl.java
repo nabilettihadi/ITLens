@@ -6,12 +6,13 @@ import ma.nabil.ITLens.exception.ResourceNotFoundException;
 import ma.nabil.ITLens.mapper.SurveyEditionMapper;
 import ma.nabil.ITLens.repository.SurveyEditionRepository;
 import ma.nabil.ITLens.service.SurveyEditionService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -28,10 +29,13 @@ public class SurveyEditionServiceImpl extends GenericServiceImpl<SurveyEditionDT
     @Override
     @Transactional(readOnly = true)
     public List<SurveyEditionDTO> getEditionsBySurveyId(Integer surveyId) {
-        return surveyEditionRepository.findBySurveyId(surveyId, Pageable.unpaged())
-                .stream()
+        Page<SurveyEdition> editions = surveyEditionRepository.findBySurveyId(surveyId, PageRequest.of(0, 10));
+        if (editions == null) {
+            throw new ResourceNotFoundException("SurveyEdition", "surveyId", surveyId);
+        }
+        return editions.stream()
                 .map(mapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
