@@ -1,5 +1,11 @@
 package ma.nabil.ITLens.service.impl;
 
+import java.util.List;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import ma.nabil.ITLens.dto.AnswerDTO;
 import ma.nabil.ITLens.entity.Answer;
 import ma.nabil.ITLens.exception.ResourceNotFoundException;
@@ -7,11 +13,6 @@ import ma.nabil.ITLens.mapper.AnswerMapper;
 import ma.nabil.ITLens.repository.AnswerRepository;
 import ma.nabil.ITLens.service.AnswerService;
 import ma.nabil.ITLens.service.QuestionService;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -26,6 +27,13 @@ public class AnswerServiceImpl extends GenericServiceImpl<AnswerDTO, Answer, Int
         this.mapper = mapper;
         this.questionService = questionService;
     }
+    @Override
+public AnswerDTO create(AnswerDTO answerDTO) {
+    Answer answer = mapper.toEntity(answerDTO);
+    answer.setQuestion(questionService.getQuestionEntity(answerDTO.getQuestionId()));
+    answer = answerRepository.save(answer);
+    return mapper.toDto(answer);
+}
 
     @Override
     @Transactional(readOnly = true)
