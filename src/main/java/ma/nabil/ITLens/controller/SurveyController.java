@@ -20,7 +20,14 @@ import org.springframework.web.bind.annotation.*;
 public class SurveyController {
     private final SurveyService surveyService;
     private final AnswerService answerService;
-    private final QuestionService questionService; 
+    private final QuestionService questionService;
+
+    @GetMapping
+    public ResponseEntity<Page<SurveyDTO>> getAllSurveys(
+            @PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(surveyService.getAll(pageable));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<SurveyDTO> getSurvey(@PathVariable Integer id) {
         return ResponseEntity.ok(surveyService.getById(id));
@@ -55,20 +62,20 @@ public class SurveyController {
     }
 
     @PostMapping("/{surveyId}/participate")
-public ResponseEntity<Void> participate(
-        @PathVariable Integer surveyId,
-        @Valid @RequestBody SurveyParticipationDTO participationDTO) {
-        
-    participationDTO.getResponses().forEach(response -> {
-        
-        questionService.incrementAnswerCount(response.getQuestionId());
-        
-        
-        response.getAnswerIds().forEach(answerId -> {
-            answerService.incrementSelectionCount(answerId);
+    public ResponseEntity<Void> participate(
+            @PathVariable Integer surveyId,
+            @Valid @RequestBody SurveyParticipationDTO participationDTO) {
+
+        participationDTO.getResponses().forEach(response -> {
+
+            questionService.incrementAnswerCount(response.getQuestionId());
+
+
+            response.getAnswerIds().forEach(answerId -> {
+                answerService.incrementSelectionCount(answerId);
+            });
         });
-    });
-    
-    return ResponseEntity.ok().build();
-}
+
+        return ResponseEntity.ok().build();
+    }
 }
