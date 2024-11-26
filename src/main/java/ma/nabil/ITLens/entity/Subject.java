@@ -2,7 +2,6 @@ package ma.nabil.ITLens.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -28,9 +27,8 @@ public class Subject {
     private List<Subject> children = new ArrayList<>();
 
     @ManyToOne
-    @NotNull(message = "Survey is mandatory")
-    @JoinColumn(name = "survey_id")
-    private Survey survey;
+    @JoinColumn(name = "survey_edition_id", nullable = true)
+    private SurveyEdition surveyEdition;
 
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions = new ArrayList<>();

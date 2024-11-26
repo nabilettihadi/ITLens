@@ -24,8 +24,5 @@ public class SurveyDTO {
     private OwnerDTO owner;
 
     @Valid
-    private List<SubjectDTO> subjects;
-
-    @Valid
     private List<SurveyEditionDTO> editions;
 }

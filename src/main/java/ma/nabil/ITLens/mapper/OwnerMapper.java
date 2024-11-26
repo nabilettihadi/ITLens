@@ -2,26 +2,16 @@ package ma.nabil.ITLens.mapper;
 
 import ma.nabil.ITLens.dto.OwnerDTO;
 import ma.nabil.ITLens.entity.Owner;
-import org.mapstruct.*;
-import org.springframework.data.domain.Page;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
-public interface OwnerMapper extends GenericMapper<OwnerDTO, Owner> {
-
+public interface OwnerMapper extends GenericMapper<Owner, OwnerDTO> {
     @Override
-    OwnerDTO toDto(Owner entity);
+    @Mapping(target = "surveys", ignore = true)
+    OwnerDTO toDto(Owner owner);
 
     @Override
     @Mapping(target = "surveys", ignore = true)
     Owner toEntity(OwnerDTO dto);
-
-    @Override
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "surveys", ignore = true)
-    void updateEntity(OwnerDTO dto, @MappingTarget Owner entity);
-
-    default Page<OwnerDTO> toDtoPage(Page<Owner> page) {
-        return page.map(this::toDto);
-    }
 }

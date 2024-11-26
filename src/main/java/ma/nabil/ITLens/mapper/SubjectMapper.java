@@ -2,31 +2,22 @@ package ma.nabil.ITLens.mapper;
 
 import ma.nabil.ITLens.dto.SubjectDTO;
 import ma.nabil.ITLens.entity.Subject;
-import org.mapstruct.*;
-import org.springframework.data.domain.Page;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = {QuestionMapper.class})
-public interface SubjectMapper extends GenericMapper<SubjectDTO, Subject> {
-
+public interface SubjectMapper extends GenericMapper<Subject, SubjectDTO> {
     @Override
-    @Mapping(target = "surveyId", source = "survey.id")
     @Mapping(target = "parentId", source = "parent.id")
-    SubjectDTO toDto(Subject entity);
+    @Mapping(target = "surveyEditionId", source = "surveyEdition.id")
+    @Mapping(target = "questions", source = "questions")
+    @Mapping(target = "children", source = "children")
+    SubjectDTO toDto(Subject subject);
 
     @Override
-    @Mapping(target = "survey", ignore = true)
-    @Mapping(target = "parent", ignore = true)
-    @Mapping(target = "children", ignore = true)
+    @Mapping(target = "parent.id", source = "parentId")
+    @Mapping(target = "surveyEdition.id", source = "surveyEditionId")
+    @Mapping(target = "questions", source = "questions")
+    @Mapping(target = "children", source = "children")
     Subject toEntity(SubjectDTO dto);
-
-    @Override
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "parent", ignore = true)
-    @Mapping(target = "survey", ignore = true)
-    void updateEntity(SubjectDTO dto, @MappingTarget Subject entity);
-
-    default Page<SubjectDTO> toDtoPage(Page<Subject> page) {
-        return page.map(this::toDto);
-    }
 }

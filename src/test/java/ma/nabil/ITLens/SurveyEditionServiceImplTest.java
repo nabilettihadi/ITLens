@@ -1,31 +1,35 @@
 package ma.nabil.ITLens;
 
 import ma.nabil.ITLens.dto.SurveyEditionDTO;
+import ma.nabil.ITLens.entity.Survey;
 import ma.nabil.ITLens.entity.SurveyEdition;
 import ma.nabil.ITLens.exception.ResourceNotFoundException;
 import ma.nabil.ITLens.mapper.SurveyEditionMapper;
 import ma.nabil.ITLens.repository.SurveyEditionRepository;
+import ma.nabil.ITLens.repository.SurveyRepository;
 import ma.nabil.ITLens.service.impl.SurveyEditionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class SurveyEditionServiceImplTest {
 
     @Mock
     private SurveyEditionRepository surveyEditionRepository;
+
+    @Mock
+    private SurveyRepository surveyRepository;
 
     @Mock
     private SurveyEditionMapper surveyEditionMapper;
@@ -39,42 +43,80 @@ class SurveyEditionServiceImplTest {
     }
 
     @Test
+    void testCreate() {
+
+        SurveyEditionDTO dto = createSurveyEditionDTO();
+        SurveyEdition edition = createSurveyEdition();
+        when(surveyRepository.existsById(dto.getSurveyId())).thenReturn(true);
+        when(surveyEditionMapper.toEntity(dto)).thenReturn(edition);
+        when(surveyEditionRepository.save(any(SurveyEdition.class))).thenReturn(edition);
+        when(surveyEditionMapper.toDto(edition)).thenReturn(dto);
+
+        SurveyEditionDTO result = surveyEditionService.create(dto);
+
+        assertNotNull(result);
+        verify(surveyEditionRepository).save(any(SurveyEdition.class));
+        verify(surveyEditionMapper).toDto(edition);
+    }
+
+    @Test
     void testGetEditionsBySurveyId() {
-        Page<SurveyEdition> page = new PageImpl<>(List.of(new SurveyEdition()));
-        when(surveyEditionRepository.findBySurveyId(1, PageRequest.of(0, 10)))
-                .thenReturn(page);
+        Integer surveyId = 1;
+        SurveyEdition edition = createSurveyEdition();
+        SurveyEditionDTO editionDTO = createSurveyEditionDTO();
+        when(surveyRepository.existsById(surveyId)).thenReturn(true);
+        when(surveyEditionRepository.findBySurveyId(surveyId)).thenReturn(List.of(edition));
+        when(surveyEditionMapper.toDto(edition)).thenReturn(editionDTO);
 
-        List<SurveyEditionDTO> result = surveyEditionService.getEditionsBySurveyId(1);
+        List<SurveyEditionDTO> result = surveyEditionService.getEditionsBySurveyId(surveyId);
+
         assertNotNull(result);
-        verify(surveyEditionRepository, times(1)).findBySurveyId(1, PageRequest.of(0, 10));
+        assertFalse(result.isEmpty());
+        verify(surveyEditionRepository).findBySurveyId(surveyId);
+        verify(surveyEditionMapper).toDto(edition);
     }
 
     @Test
-    void testGetCurrentEdition() {
-        SurveyEdition surveyEdition = new SurveyEdition();
-        when(surveyEditionRepository.findBySurveyId(1, PageRequest.of(0, 1)))
-                .thenReturn(new PageImpl<>(List.of(surveyEdition)));
-        when(surveyEditionMapper.toDto(surveyEdition)).thenReturn(new SurveyEditionDTO());
+    void testGetById() {
+        Integer id = 1;
+        SurveyEdition edition = createSurveyEdition();
+        SurveyEditionDTO editionDTO = createSurveyEditionDTO();
+        when(surveyEditionRepository.findById(id)).thenReturn(Optional.of(edition));
+        when(surveyEditionMapper.toDto(edition)).thenReturn(editionDTO);
 
-        SurveyEditionDTO result = surveyEditionService.getCurrentEdition(1);
+        SurveyEditionDTO result = surveyEditionService.getById(id);
+
         assertNotNull(result);
-        verify(surveyEditionRepository, times(1)).findBySurveyId(1, PageRequest.of(0, 1));
+        verify(surveyEditionRepository).findById(id);
+        verify(surveyEditionMapper).toDto(edition);
     }
 
     @Test
-    void testGetSurveyEditionEntity() {
-        SurveyEdition surveyEdition = new SurveyEdition();
-        when(surveyEditionRepository.findById(1)).thenReturn(Optional.of(surveyEdition));
+    void testGetByIdNotFound() {
+        Integer id = 1;
+        when(surveyEditionRepository.findById(id)).thenReturn(Optional.empty());
 
-        SurveyEdition result = surveyEditionService.getSurveyEditionEntity(1);
-        assertNotNull(result);
-        verify(surveyEditionRepository, times(1)).findById(1);
+        assertThrows(ResourceNotFoundException.class, () -> surveyEditionService.getById(id));
+        verify(surveyEditionRepository).findById(id);
     }
 
-    @Test
-    void testGetSurveyEditionEntityNotFound() {
-        when(surveyEditionRepository.findById(1)).thenReturn(Optional.empty());
+    private SurveyEdition createSurveyEdition() {
+        SurveyEdition edition = new SurveyEdition();
+        edition.setId(1);
+        edition.setCreationDate(new Date());
+        edition.setStartDate(new Date());
+        edition.setYear(2024);
+        edition.setSurvey(new Survey());
+        return edition;
+    }
 
-        assertThrows(ResourceNotFoundException.class, () -> surveyEditionService.getSurveyEditionEntity(1));
+    private SurveyEditionDTO createSurveyEditionDTO() {
+        SurveyEditionDTO dto = new SurveyEditionDTO();
+        dto.setId(1);
+        dto.setCreationDate(new Date());
+        dto.setStartDate(new Date());
+        dto.setYear(2024);
+        dto.setSurveyId(1);
+        return dto;
     }
 }

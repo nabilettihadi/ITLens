@@ -2,13 +2,15 @@ package ma.nabil.ITLens.repository;
 
 import ma.nabil.ITLens.entity.Subject;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface SubjectRepository extends JpaRepository<Subject, Integer> {
-    List<Subject> findBySurveyIdAndParentIsNull(Integer surveyId);
+    List<Subject> findByParentIsNullAndSurveyEditionId(Integer surveyEditionId);
 
-    @Query("SELECT s FROM Subject s LEFT JOIN FETCH s.children WHERE s.id = :id")
-    Subject findByIdWithChildren(Integer id);
+    List<Subject> findByParentId(Integer parentId);
+
+    void deleteByParentId(Integer parentId);
 }

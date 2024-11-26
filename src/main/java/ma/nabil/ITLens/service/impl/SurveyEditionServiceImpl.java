@@ -1,72 +1,67 @@
 package ma.nabil.ITLens.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import ma.nabil.ITLens.dto.SurveyEditionDTO;
 import ma.nabil.ITLens.entity.SurveyEdition;
 import ma.nabil.ITLens.exception.ResourceNotFoundException;
 import ma.nabil.ITLens.mapper.SurveyEditionMapper;
-import ma.nabil.ITLens.mapper.SurveyMapper;
 import ma.nabil.ITLens.repository.SurveyEditionRepository;
+import ma.nabil.ITLens.repository.SurveyRepository;
 import ma.nabil.ITLens.service.SurveyEditionService;
-import ma.nabil.ITLens.service.SurveyService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional
-public class SurveyEditionServiceImpl extends GenericServiceImpl<SurveyEditionDTO, SurveyEdition, Integer> implements SurveyEditionService {
+public class SurveyEditionServiceImpl extends GenericServiceImpl<SurveyEdition, SurveyEditionDTO, Integer> implements SurveyEditionService {
+    private final SurveyRepository surveyRepository;
     private final SurveyEditionRepository surveyEditionRepository;
-    private final SurveyService surveyService;
-    private final SurveyEditionMapper mapper;
 
     public SurveyEditionServiceImpl(
-            SurveyEditionRepository repository, 
+            SurveyEditionRepository repository,
             SurveyEditionMapper mapper,
-            SurveyService surveyService) {
-        super(repository, mapper, "SurveyEdition");
+            SurveyRepository surveyRepository) {
+        super(repository, mapper);
+        this.surveyRepository = surveyRepository;
         this.surveyEditionRepository = repository;
-        this.mapper = mapper;
-        this.surveyService = surveyService;
     }
 
     @Override
     public SurveyEditionDTO create(SurveyEditionDTO dto) {
-        SurveyEdition entity = mapper.toEntity(dto);
-        entity.setSurvey(surveyService.getSurveyEntity(dto.getSurveyId()));
-        entity = surveyEditionRepository.save(entity);
-        return mapper.toDto(entity);
+        validateSurvey(dto.getSurveyId());
+        SurveyEdition edition = mapper.toEntity(dto);
+        edition.setCreationDate(new Date());
+        SurveyEdition savedEdition = repository.save(edition);
+        return mapper.toDto(savedEdition);
     }
 
-
     @Override
-    @Transactional(readOnly = true)
     public List<SurveyEditionDTO> getEditionsBySurveyId(Integer surveyId) {
-        Page<SurveyEdition> editions = surveyEditionRepository.findBySurveyId(surveyId, PageRequest.of(0, 10));
-        if (editions == null) {
-            throw new ResourceNotFoundException("SurveyEdition", "surveyId", surveyId);
-        }
-        return editions.stream()
+        validateSurvey(surveyId);
+        return surveyEditionRepository.findBySurveyId(surveyId)
+                .stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public SurveyEditionDTO getCurrentEdition(Integer surveyId) {
-        return surveyEditionRepository.findBySurveyId(surveyId, PageRequest.of(0, 1))
-                .stream()
-                .findFirst()
-                .map(mapper::toDto)
-                .orElseThrow(() -> new ResourceNotFoundException("SurveyEdition", "surveyId", surveyId));
+    protected String getEntityName() {
+        return "SurveyEdition";
     }
 
     @Override
-    public SurveyEdition getSurveyEditionEntity(Integer id) {
-        return surveyEditionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("SurveyEdition", "id", id));
+    protected void setEntityId(SurveyEdition entity, Integer id) {
+        entity.setId(id);
+    }
+
+    private void validateSurvey(Integer surveyId) {
+        if (!surveyRepository.existsById(surveyId)) {
+            throw new ResourceNotFoundException("Survey", surveyId);
+        }
     }
 }

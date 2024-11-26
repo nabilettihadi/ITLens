@@ -10,25 +10,46 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
-@Transactional
-public abstract class GenericServiceImpl<D, E, ID> implements GenericService<D, ID> {
+public abstract class GenericServiceImpl<E, D, ID> implements GenericService<D, ID> {
+
     protected final JpaRepository<E, ID> repository;
-    protected final GenericMapper<D, E> mapper;
-    protected final String entityName;
+    protected final GenericMapper<E, D> mapper;
 
     @Override
+    @Transactional
     public D create(D dto) {
         E entity = mapper.toEntity(dto);
-        entity = repository.save(entity);
-        return mapper.toDto(entity);
+        E savedEntity = repository.save(entity);
+        return mapper.toDto(savedEntity);
+    }
+
+    @Override
+    @Transactional
+    public D update(ID id, D dto) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException(getEntityName(), id);
+        }
+        E entity = mapper.toEntity(dto);
+        setEntityId(entity, id);
+        E updatedEntity = repository.save(entity);
+        return mapper.toDto(updatedEntity);
+    }
+
+    @Override
+    @Transactional
+    public void delete(ID id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException(getEntityName(), id);
+        }
+        repository.deleteById(id);
     }
 
     @Override
     @Transactional(readOnly = true)
     public D getById(ID id) {
-        return repository.findById(id)
-                .map(mapper::toDto)
-                .orElseThrow(() -> new ResourceNotFoundException(entityName, "id", id));
+        E entity = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(getEntityName(), id));
+        return mapper.toDto(entity);
     }
 
     @Override
@@ -37,20 +58,7 @@ public abstract class GenericServiceImpl<D, E, ID> implements GenericService<D, 
         return repository.findAll(pageable).map(mapper::toDto);
     }
 
-    @Override
-    public D update(ID id, D dto) {
-        E entity = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(entityName, "id", id));
-        mapper.updateEntity(dto, entity);
-        entity = repository.save(entity);
-        return mapper.toDto(entity);
-    }
+    protected abstract String getEntityName();
 
-    @Override
-    public void delete(ID id) {
-        if (!repository.existsById(id)) {
-            throw new ResourceNotFoundException(entityName, "id", id);
-        }
-        repository.deleteById(id);
-    }
+    protected abstract void setEntityId(E entity, ID id);
 }

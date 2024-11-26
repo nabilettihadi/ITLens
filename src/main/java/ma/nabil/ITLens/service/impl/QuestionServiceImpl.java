@@ -1,55 +1,84 @@
 package ma.nabil.ITLens.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import ma.nabil.ITLens.dto.QuestionDTO;
 import ma.nabil.ITLens.entity.Question;
 import ma.nabil.ITLens.exception.ResourceNotFoundException;
 import ma.nabil.ITLens.mapper.QuestionMapper;
 import ma.nabil.ITLens.repository.QuestionRepository;
+import ma.nabil.ITLens.repository.SubjectRepository;
 import ma.nabil.ITLens.service.QuestionService;
-import ma.nabil.ITLens.service.SubjectService;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional
-public class QuestionServiceImpl extends GenericServiceImpl<QuestionDTO, Question, Integer> implements QuestionService {
+public class QuestionServiceImpl extends GenericServiceImpl<Question, QuestionDTO, Integer> implements QuestionService {
+    private final SubjectRepository subjectRepository;
     private final QuestionRepository questionRepository;
-    private final SubjectService subjectService;
 
-    public QuestionServiceImpl(QuestionRepository repository, QuestionMapper mapper, SubjectService subjectService) {
-        super(repository, mapper, "Question");
+    public QuestionServiceImpl(
+            QuestionRepository repository,
+            QuestionMapper mapper,
+            SubjectRepository subjectRepository) {
+        super(repository, mapper);
+        this.subjectRepository = subjectRepository;
         this.questionRepository = repository;
-        this.subjectService = subjectService;
     }
 
     @Override
     public QuestionDTO createQuestion(QuestionDTO questionDTO) {
+        validateSubject(questionDTO.getSubjectId());
         Question question = mapper.toEntity(questionDTO);
-        question.setSubject(subjectService.getSubjectEntity(questionDTO.getSubjectId()));
-        question = questionRepository.save(question);
-        return mapper.toDto(question);
+        question.setAnswerCount(0);
+
+        if (question.getAnswers() != null) {
+            question.getAnswers().forEach(answer -> {
+                answer.setQuestion(question);
+                answer.setSelectionCount(0);
+                answer.setPercentage(0.0);
+            });
+        }
+
+        Question savedQuestion = questionRepository.save(question);
+        return mapper.toDto(savedQuestion);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<QuestionDTO> getQuestionsBySubjectId(Integer subjectId) {
-        return questionRepository.findBySubjectId(subjectId, Pageable.unpaged())
+        validateSubject(subjectId);
+        return questionRepository.findBySubjectId(subjectId)
                 .stream()
                 .map(mapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional
     public void incrementAnswerCount(Integer questionId) {
+        if (!repository.existsById(questionId)) {
+            throw new ResourceNotFoundException(getEntityName(), questionId);
+        }
         questionRepository.incrementAnswerCount(questionId);
     }
 
     @Override
-    public Question getQuestionEntity(Integer id) {
-        return questionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Question", "id", id));
+    protected String getEntityName() {
+        return "Question";
+    }
+
+    @Override
+    protected void setEntityId(Question entity, Integer id) {
+        entity.setId(id);
+    }
+
+    private void validateSubject(Integer subjectId) {
+        if (!subjectRepository.existsById(subjectId)) {
+            throw new ResourceNotFoundException("Subject", subjectId);
+        }
     }
 }

@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -24,8 +26,11 @@ public class SurveyEdition {
     @NotNull(message = "Year is mandatory")
     private Integer year;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @NotNull(message = "Survey is mandatory")
-    @JoinColumn(name = "survey_id")
+    @JoinColumn(name = "survey_id", nullable = false)
     private Survey survey;
+
+    @OneToMany(mappedBy = "surveyEdition", cascade = CascadeType.ALL)
+    private List<Subject> subjects = new ArrayList<>();
 }

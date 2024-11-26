@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import ma.nabil.ITLens.entity.Subject;
-import ma.nabil.ITLens.entity.Survey;
+import ma.nabil.ITLens.entity.SurveyEdition;
 import ma.nabil.ITLens.validation.annotation.Exists;
 
 import java.util.List;
@@ -23,10 +23,10 @@ public class SubjectDTO {
     @Exists(entity = Subject.class, message = "Le sujet parent spécifié n'existe pas")
     private Integer parentId;
 
-    @NotNull(message = "Survey ID is mandatory")
-    @Positive(message = "Survey ID must be positive")
-    @Exists(entity = Survey.class, message = "Le sondage spécifié n'existe pas")
-    private Integer surveyId;
+    @NotNull(message = "Survey Edition ID is mandatory")
+    @Positive(message = "Survey Edition ID must be positive")
+    @Exists(entity = SurveyEdition.class, message = "L'édition du sondage spécifiée n'existe pas")
+    private Integer surveyEditionId;
 
     @Valid
     private List<SubjectDTO> children;

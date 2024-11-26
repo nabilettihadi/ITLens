@@ -2,27 +2,18 @@ package ma.nabil.ITLens.mapper;
 
 import ma.nabil.ITLens.dto.SurveyEditionDTO;
 import ma.nabil.ITLens.entity.SurveyEdition;
-import org.mapstruct.*;
-import org.springframework.data.domain.Page;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring")
-public interface SurveyEditionMapper extends GenericMapper<SurveyEditionDTO, SurveyEdition> {
-
+@Mapper(componentModel = "spring", uses = {SubjectMapper.class})
+public interface SurveyEditionMapper extends GenericMapper<SurveyEdition, SurveyEditionDTO> {
     @Override
     @Mapping(target = "surveyId", source = "survey.id")
-    SurveyEditionDTO toDto(SurveyEdition entity);
+    @Mapping(target = "subjects", source = "subjects")
+    SurveyEditionDTO toDto(SurveyEdition surveyEdition);
 
     @Override
-    @Mapping(target = "survey", ignore = true)
+    @Mapping(target = "survey.id", source = "surveyId")
+    @Mapping(target = "subjects", source = "subjects")
     SurveyEdition toEntity(SurveyEditionDTO dto);
-
-    @Override
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "survey", ignore = true)
-    void updateEntity(SurveyEditionDTO dto, @MappingTarget SurveyEdition entity);
-
-    default Page<SurveyEditionDTO> toDtoPage(Page<SurveyEdition> page) {
-        return page.map(this::toDto);
-    }
 }

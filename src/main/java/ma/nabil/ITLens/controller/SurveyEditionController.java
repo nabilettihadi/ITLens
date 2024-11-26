@@ -39,8 +39,8 @@ public class SurveyEditionController {
     @PostMapping
     public ResponseEntity<SurveyEditionDTO> createSurveyEdition(
             @Valid @RequestBody SurveyEditionDTO surveyEditionDTO) {
-        return new ResponseEntity<>(surveyEditionService.create(surveyEditionDTO), 
-                                  HttpStatus.CREATED);
+        return new ResponseEntity<>(surveyEditionService.create(surveyEditionDTO),
+                HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

@@ -33,11 +33,6 @@ public class SurveyController {
         return ResponseEntity.ok(surveyService.getById(id));
     }
 
-    @GetMapping("/{id}/with-subjects")
-    public ResponseEntity<SurveyDTO> getSurveyWithSubjects(@PathVariable Integer id) {
-        return ResponseEntity.ok(surveyService.getSurveyWithSubjects(id));
-    }
-
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<Page<SurveyDTO>> getSurveysByOwnerId(
             @PathVariable Integer ownerId,
@@ -69,7 +64,6 @@ public class SurveyController {
         participationDTO.getResponses().forEach(response -> {
 
             questionService.incrementAnswerCount(response.getQuestionId());
-
 
             response.getAnswerIds().forEach(answerId -> {
                 answerService.incrementSelectionCount(answerId);

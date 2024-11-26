@@ -2,28 +2,18 @@ package ma.nabil.ITLens.mapper;
 
 import ma.nabil.ITLens.dto.QuestionDTO;
 import ma.nabil.ITLens.entity.Question;
-import org.mapstruct.*;
-import org.springframework.data.domain.Page;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = {AnswerMapper.class})
-public interface QuestionMapper extends GenericMapper<QuestionDTO, Question> {
-
+public interface QuestionMapper extends GenericMapper<Question, QuestionDTO> {
     @Override
     @Mapping(target = "subjectId", source = "subject.id")
-    QuestionDTO toDto(Question entity);
+    @Mapping(target = "answers", source = "answers")
+    QuestionDTO toDto(Question question);
 
     @Override
-    @Mapping(target = "subject", ignore = true)
-    @Mapping(target = "answers", ignore = true)
+    @Mapping(target = "subject.id", source = "subjectId")
+    @Mapping(target = "answers", source = "answers")
     Question toEntity(QuestionDTO dto);
-
-    @Override
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "subject", ignore = true)
-    void updateEntity(QuestionDTO dto, @MappingTarget Question entity);
-
-    default Page<QuestionDTO> toDtoPage(Page<Question> page) {
-        return page.map(this::toDto);
-    }
 }

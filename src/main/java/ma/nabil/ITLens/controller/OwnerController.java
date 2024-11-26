@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class OwnerController {
     private final OwnerService ownerService;
 
-        @GetMapping
+    @GetMapping
     public ResponseEntity<Page<OwnerDTO>> getAllOwners(
             @PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.ok(ownerService.getAll(pageable));

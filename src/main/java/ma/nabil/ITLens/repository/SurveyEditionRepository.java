@@ -1,12 +1,14 @@
 package ma.nabil.ITLens.repository;
 
 import ma.nabil.ITLens.entity.SurveyEdition;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
+@Repository
 public interface SurveyEditionRepository extends JpaRepository<SurveyEdition, Integer> {
-    Page<SurveyEdition> findBySurveyId(Integer surveyId, Pageable pageable);
+    List<SurveyEdition> findBySurveyId(Integer surveyId);
 
-    Page<SurveyEdition> findByYear(Integer year, Pageable pageable);
+    List<SurveyEdition> findBySurveyIdAndYear(Integer surveyId, Integer year);
 }
