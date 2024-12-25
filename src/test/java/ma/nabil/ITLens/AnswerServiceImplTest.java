@@ -3,6 +3,7 @@ package ma.nabil.ITLens;
 import ma.nabil.ITLens.dto.AnswerDTO;
 import ma.nabil.ITLens.entity.Answer;
 import ma.nabil.ITLens.entity.Question;
+import ma.nabil.ITLens.entity.QuestionType;
 import ma.nabil.ITLens.exception.ResourceNotFoundException;
 import ma.nabil.ITLens.mapper.AnswerMapper;
 import ma.nabil.ITLens.repository.AnswerRepository;
@@ -18,7 +19,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class AnswerServiceImplTest {
 
@@ -35,8 +38,15 @@ class AnswerServiceImplTest {
     private AnswerServiceImpl answerService;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        Question question = new Question();
+        question.setId(1);
+        question.setText("Sample question?");
+        question.setType(QuestionType.CHOIX_UNIQUE);
+
+        when(questionRepository.findById(1)).thenReturn(Optional.of(question));
     }
 
     @Test
@@ -101,10 +111,11 @@ class AnswerServiceImplTest {
 
     @Test
     void testCreate() {
-
         AnswerDTO dto = new AnswerDTO();
         dto.setQuestionId(1);
+        dto.setSelectionCount(1);
         Answer answer = new Answer();
+
         when(questionRepository.existsById(1)).thenReturn(true);
         when(answerMapper.toEntity(dto)).thenReturn(answer);
         when(answerRepository.save(any(Answer.class))).thenReturn(answer);

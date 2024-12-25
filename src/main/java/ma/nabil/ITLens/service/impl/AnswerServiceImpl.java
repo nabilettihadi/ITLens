@@ -42,10 +42,12 @@ public class AnswerServiceImpl extends GenericServiceImpl<Answer, AnswerDTO, Int
             throw new InvalidAnswerException("Pour une question à choix unique, une seule réponse est autorisée.");
         }
 
-        Answer answer = new Answer();
-        answer.setText(answerDTO.getText());
+        Answer answer = mapper.toEntity(answerDTO);
         answer.setQuestion(question);
-        return answerDTO;
+
+        answerRepository.save(answer);
+
+        return mapper.toDto(answer);
     }
 
     @Override
