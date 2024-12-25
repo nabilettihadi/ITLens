@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import ma.nabil.ITLens.entity.Subject;
 import ma.nabil.ITLens.entity.SurveyEdition;
 import ma.nabil.ITLens.validation.annotation.Exists;
 
@@ -20,7 +19,6 @@ public class SubjectDTO {
     @Size(min = 3, max = 100, message = "Title must be between 3 and 100 characters")
     private String title;
 
-    @Exists(entity = Subject.class, message = "Le sujet parent spécifié n'existe pas")
     private Integer parentId;
 
     @NotNull(message = "Survey Edition ID is mandatory")

@@ -21,9 +21,9 @@ public class SubjectController {
         return ResponseEntity.ok(subjectService.getById(id));
     }
 
-    @GetMapping("/survey/{surveyId}/root")
-    public ResponseEntity<List<SubjectDTO>> getRootSubjects(@PathVariable Integer surveyId) {
-        return ResponseEntity.ok(subjectService.getRootSubjects(surveyId));
+    @GetMapping("/survey-edition/{surveyEditionId}/root")
+    public ResponseEntity<List<SubjectDTO>> getRootSubjects(@PathVariable Integer surveyEditionId) {
+        return ResponseEntity.ok(subjectService.getRootSubjects(surveyEditionId));
     }
 
     @GetMapping("/{parentId}/children")

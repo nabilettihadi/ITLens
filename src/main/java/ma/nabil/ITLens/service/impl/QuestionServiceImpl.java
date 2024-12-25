@@ -1,7 +1,9 @@
 package ma.nabil.ITLens.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import ma.nabil.ITLens.dto.AnswerDTO;
 import ma.nabil.ITLens.dto.QuestionDTO;
+import ma.nabil.ITLens.entity.Answer;
 import ma.nabil.ITLens.entity.Question;
 import ma.nabil.ITLens.exception.ResourceNotFoundException;
 import ma.nabil.ITLens.mapper.QuestionMapper;
@@ -46,6 +48,39 @@ public class QuestionServiceImpl extends GenericServiceImpl<Question, QuestionDT
 
         Question savedQuestion = questionRepository.save(question);
         return mapper.toDto(savedQuestion);
+    }
+
+    @Override
+    public QuestionDTO update(Integer id, QuestionDTO questionDTO) {
+        Question question = questionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Question", id));
+
+        question.setText(questionDTO.getText());
+        question.setType(questionDTO.getType());
+        question.setAnswerCount(questionDTO.getAnswerCount());
+
+        List<Answer> answers = question.getAnswers();
+        answers.clear();
+        for (AnswerDTO answerDTO : questionDTO.getAnswers()) {
+            Answer answer = new Answer();
+            answer.setText(answerDTO.getText());
+            answer.setQuestion(question);
+            answers.add(answer);
+        }
+
+        return mapper.toDto(questionRepository.save(question));
+    }
+
+    @Override
+    public void delete(Integer id) {
+        Question question = questionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Question", id));
+
+        question.getAnswers().forEach(answer -> {
+            answer.setQuestion(null);
+        });
+
+        questionRepository.delete(question);
     }
 
     @Override

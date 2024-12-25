@@ -10,6 +10,7 @@ import ma.nabil.ITLens.entity.QuestionType;
 import ma.nabil.ITLens.entity.Subject;
 import ma.nabil.ITLens.validation.annotation.Exists;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -31,5 +32,5 @@ public class QuestionDTO {
     private Integer subjectId;
 
     @Valid
-    private List<AnswerDTO> answers;
+    private List<AnswerDTO> answers = new ArrayList<>();
 }

@@ -27,7 +27,7 @@ public class Subject {
     private List<Subject> children = new ArrayList<>();
 
     @ManyToOne
-    @JoinColumn(name = "survey_edition_id", nullable = true)
+    @JoinColumn(name = "survey_edition_id", nullable = false)
     private SurveyEdition surveyEdition;
 
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)

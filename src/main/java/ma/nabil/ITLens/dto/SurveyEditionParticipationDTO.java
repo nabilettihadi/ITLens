@@ -11,7 +11,7 @@ import ma.nabil.ITLens.validation.annotation.Exists;
 import java.util.List;
 
 @Data
-public class SurveyParticipationDTO {
+public class SurveyEditionParticipationDTO {
     @NotEmpty(message = "Responses list cannot be empty")
     @Valid
     private List<ResponseDTO> responses;

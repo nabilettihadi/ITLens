@@ -3,6 +3,9 @@ package ma.nabil.ITLens.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import ma.nabil.ITLens.dto.SurveyEditionDTO;
+import ma.nabil.ITLens.dto.SurveyEditionParticipationDTO;
+import ma.nabil.ITLens.service.AnswerService;
+import ma.nabil.ITLens.service.QuestionService;
 import ma.nabil.ITLens.service.SurveyEditionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SurveyEditionController {
     private final SurveyEditionService surveyEditionService;
+    private final AnswerService answerService;
+    private final QuestionService questionService;
 
     @GetMapping("/{id}")
     public ResponseEntity<SurveyEditionDTO> getSurveyEdition(@PathVariable Integer id) {
@@ -54,5 +59,20 @@ public class SurveyEditionController {
     public ResponseEntity<Void> deleteSurveyEdition(@PathVariable Integer id) {
         surveyEditionService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{surveyEditionId}/participate")
+    public ResponseEntity<Void> participate(
+            @PathVariable Integer surveyEditionId,
+            @Valid @RequestBody SurveyEditionParticipationDTO participationDTO) {
+
+        participationDTO.getResponses().forEach(response -> {
+            questionService.incrementAnswerCount(response.getQuestionId());
+            response.getAnswerIds().forEach(answerId -> {
+                answerService.incrementSelectionCount(answerId);
+            });
+        });
+
+        return ResponseEntity.ok().build();
     }
 }

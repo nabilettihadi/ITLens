@@ -1,8 +1,11 @@
 package ma.nabil.ITLens.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import ma.nabil.ITLens.dto.SubjectDTO;
 import ma.nabil.ITLens.entity.Subject;
+import ma.nabil.ITLens.entity.SurveyEdition;
+import ma.nabil.ITLens.exception.InvalidSubjectException;
 import ma.nabil.ITLens.exception.ResourceNotFoundException;
 import ma.nabil.ITLens.mapper.SubjectMapper;
 import ma.nabil.ITLens.repository.SubjectRepository;
@@ -18,25 +21,31 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class SubjectServiceImpl extends GenericServiceImpl<Subject, SubjectDTO, Integer> implements SubjectService {
-    private final SurveyEditionRepository surveyEditionRepository;
     private final SubjectRepository subjectRepository;
+    private final SurveyEditionRepository surveyEditionRepository;
 
-    public SubjectServiceImpl(
-            SubjectRepository repository,
-            SubjectMapper mapper,
-            SurveyEditionRepository surveyEditionRepository) {
+    public SubjectServiceImpl(SubjectRepository repository, SubjectMapper mapper, SurveyEditionRepository surveyEditionRepository) {
         super(repository, mapper);
-        this.surveyEditionRepository = surveyEditionRepository;
         this.subjectRepository = repository;
+        this.surveyEditionRepository = surveyEditionRepository;
     }
 
     @Override
-    public SubjectDTO create(SubjectDTO dto) {
-        validateSurveyEdition(dto.getSurveyEditionId());
-        if (dto.getParentId() != null) {
-            validateParentSubject(dto.getParentId());
+    public SubjectDTO create(SubjectDTO subjectDTO) {
+        SurveyEdition surveyEdition = surveyEditionRepository.findById(subjectDTO.getSurveyEditionId())
+                .orElseThrow(() -> new ResourceNotFoundException("SurveyEdition", subjectDTO.getSurveyEditionId()));
+
+        if (subjectDTO.getParentId() != null) {
+            Subject parentSubject = subjectRepository.findById(subjectDTO.getParentId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Parent Subject", subjectDTO.getParentId()));
+            if (!parentSubject.getSurveyEdition().getId().equals(surveyEdition.getId())) {
+                throw new InvalidSubjectException("Le sujet parent doit avoir le même ID d'édition d'enquête.");
+            }
         }
-        return super.create(dto);
+
+        Subject subject = new Subject();
+        subject.setSurveyEdition(surveyEdition);
+        return subjectDTO;
     }
 
     @Override
@@ -62,6 +71,34 @@ public class SubjectServiceImpl extends GenericServiceImpl<Subject, SubjectDTO, 
         validateParentSubject(parentId);
         childDTO.setParentId(parentId);
         return create(childDTO);
+    }
+
+    @Override
+    public SubjectDTO update(Integer id, SubjectDTO subjectDTO) {
+        Subject subject = subjectRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Subject", id));
+
+        subject.setTitle(subjectDTO.getTitle());
+
+        if (subjectDTO.getParentId() != null) {
+            Subject parent = subjectRepository.findById(subjectDTO.getParentId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Subject", subjectDTO.getParentId()));
+            subject.setParent(parent);
+        } else {
+            subject.setParent(null);
+        }
+
+        Subject updatedSubject = subjectRepository.save(subject);
+        return mapper.toDto(updatedSubject);
+    }
+
+    public void deleteSubject(Integer subjectId) {
+
+        if (!subjectRepository.existsById(subjectId)) {
+            throw new EntityNotFoundException("Subject not found");
+        }
+
+        subjectRepository.deleteById(subjectId);
     }
 
     @Override

@@ -3,6 +3,9 @@ package ma.nabil.ITLens.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import ma.nabil.ITLens.dto.AnswerDTO;
 import ma.nabil.ITLens.entity.Answer;
+import ma.nabil.ITLens.entity.Question;
+import ma.nabil.ITLens.entity.QuestionType;
+import ma.nabil.ITLens.exception.InvalidAnswerException;
 import ma.nabil.ITLens.exception.ResourceNotFoundException;
 import ma.nabil.ITLens.mapper.AnswerMapper;
 import ma.nabil.ITLens.repository.AnswerRepository;
@@ -31,13 +34,18 @@ public class AnswerServiceImpl extends GenericServiceImpl<Answer, AnswerDTO, Int
     }
 
     @Override
-    public AnswerDTO create(AnswerDTO dto) {
-        validateQuestion(dto.getQuestionId());
-        Answer answer = mapper.toEntity(dto);
-        answer.setSelectionCount(0);
-        answer.setPercentage(0.0);
-        Answer savedAnswer = repository.save(answer);
-        return mapper.toDto(savedAnswer);
+    public AnswerDTO create(AnswerDTO answerDTO) {
+        Question question = questionRepository.findById(answerDTO.getQuestionId())
+                .orElseThrow(() -> new ResourceNotFoundException("Question", answerDTO.getQuestionId()));
+
+        if (question.getType() == QuestionType.CHOIX_UNIQUE && answerDTO.getSelectionCount() > 1) {
+            throw new InvalidAnswerException("Pour une question à choix unique, une seule réponse est autorisée.");
+        }
+
+        Answer answer = new Answer();
+        answer.setText(answerDTO.getText());
+        answer.setQuestion(question);
+        return answerDTO;
     }
 
     @Override
